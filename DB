@@ -1,0 +1,76 @@
+Master database layout:
+
+collection sites
+{
+	{
+		_id: sitename,
+		dbname: (string),
+	}
+}
+
+Site database layout:
+
+collection settings
+{
+	{
+		_id: (string)property_name,
+		value: object
+	}
+}
+
+collection users
+{
+	{
+		_id: (string)Username,
+		passwd: (md5)
+	}
+}
+
+collection templates
+{
+	{
+		_id: (MongoID),
+		name: (string),
+		theme: (string),
+		type: (int) enum { page, include, iter },
+		notes: (text),
+		body: (Twig code)
+	}
+}
+
+collection versions
+{
+	{
+		_id: (MongoID),
+		page: (MongoID)pages._id,
+		version: (int), /* yes, it's a copy of body.version. we know. */
+		body: embed pages.body
+	}
+}
+
+collection pages
+{
+	{
+		_id: (MongoID),
+		parent: ObjectID,
+		path: (string),
+		template: (string)templatename,
+		order: (int),
+		display: (bool),
+		disable: (bool),
+		access: { /* possibly not implemented */
+				owner: users._id,
+			       read_acl: { /* user's _ids, or '@group' */ },
+			       write_acl: { /* same as read_acl */ },
+		},
+		body: {
+				title: (string),
+				author: users._id,
+				content: (text),
+				version: (int),
+				uattr: /* user defined attributes */ {
+					blahblahblah: blah
+				}
+		}
+	}
+}
